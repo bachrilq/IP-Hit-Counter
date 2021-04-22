@@ -1,0 +1,20 @@
+version: '3.3'
+
+services:
+  db:
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: agent775
+      MYSQL_DATABASE: ip_hit_db
+
+  ip-hit:
+    build:
+      context: .
+    image: registry.gitlab.com/mamazary/ip-hit
+    ports:
+      - '80:80'
+    env_file:
+      - docker-compose.env
+    restart: always

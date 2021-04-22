@@ -1,0 +1,47 @@
+before_script:
+  - docker login -u $CI_DEPLOY_USER -p $CI_DEPLOY_PASSWORD $CI_REGISTRY
+
+stages:
+  - build
+  - deploy
+
+build-image:
+  stage: build
+  script:
+    - docker build -t registry.gitlab.com/mamazary/ip-hit -f Dockerfile
+    - docker push registry.gitlab.com/mamazary/ip-hit
+  only:
+    - staging
+  tags:
+    - ip-hit
+
+deploy-staging:
+  stage: deploy
+  environment:
+    name: staging
+    url: https://$STAGING_DOMAIN
+  script:
+    - docker-compose -f docker-compose.yml pull
+    - docker-compose -f docker-compose.yml up -d
+  only:
+    - staging
+  tags:
+    - ip-hit
+
+deploy-logging-staging:
+  stage: deploy
+  script:
+    - docker-compose -f docker-compose.yml up -d
+  only:
+    - logging-staging
+  tags:
+    - ip-hit
+
+deploy-observability-staging:
+  stage: deploy
+  script:
+    - docker-compose -f docker-compose.yml up -d
+  only:
+    - observability-staging
+  tags:
+    - ip-hit
