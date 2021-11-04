@@ -20,7 +20,7 @@ RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf
 WORKDIR /var/www/html
 
 # Install zip & unzip
-RUN apt-get update && apt-get install zip unzip
+RUN apt-get --allow-releaseinfo-change update &&  apt-get update && apt-get install zip unzip
 
 # Install ssl lib
 RUN apt-get install -y libcurl4-openssl-dev pkg-config libssl-dev
