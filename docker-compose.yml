@@ -4,15 +4,16 @@ services:
   db:
     image: mariadb
     restart: always
-    environment:
-      - docker-compose.env
+    env_file:
+      - ./docker-compose.env
 
   ip-hit:
     build:
       context: .
-    image: registry.gitlab.com/mamazary/ip-hit
+    image: test-halo
     ports:
-      - '80:80'
+      - '80:8000'
+    command: php -S ip-hit:8000 -t public
     env_file:
-      - docker-compose.env
+      - ./docker-compose.env
     restart: always
