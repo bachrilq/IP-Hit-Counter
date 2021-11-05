@@ -1,35 +1,11 @@
-# Build from mamazary docker image for PHP & apache2
-FROM mamazary/php-bundle:7.4
+FROM php:7.4-fpm-alpine
 
-# Set the environment variable
-ENV APACHE_DOCUMENT_ROOT /path/to/webroot
+WORKDIR /var/www/html/
 
-# Get and install composer
-RUN curl -sS https://getcomposer.org/installer | php \
-    && mv composer.phar /usr/local/bin/ \
-    && ln -s /usr/local/bin/composer.phar /usr/local/bin/composer
+RUN php -r "readfile('http://getcomposer.org/installer');" | php -- --install-dir=/usr/bin/ --filename=composer
 
-# Set composer path
-ENV PATH="~/.composer/vendor/bin:./vendor/bin:${PATH}"
+COPY . .
 
-# Change the APACHE_DOCUMENT_ROOT
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
-RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+RUN docker-php-ext-install mysqli pdo pdo_mysql && docker-php-ext-enable pdo_mysql
 
-# Change workdir to apache root folder
-WORKDIR /var/www/html
-
-# Install zip & unzip
-RUN apt-get --allow-releaseinfo-change update &&  apt-get update && apt-get install zip unzip
-
-# Install ssl lib
-RUN apt-get install -y libcurl4-openssl-dev pkg-config libssl-dev
-
-# Copy source code from root directory
-COPY . /var/www/html/.
-
-# Install vendor / update if any
 RUN composer update
-
-# Give the apache user & group permission to the source code
-RUN chown www-data:www-data * -R
