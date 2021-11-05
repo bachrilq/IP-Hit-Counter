@@ -10,7 +10,7 @@ services:
   ip-hit:
     build:
       context: .
-    image: test-halo
+    image: ip-hit
     ports:
       - '80:8000'
     command: php -S ip-hit:8000 -t public
