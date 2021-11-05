@@ -8,4 +8,4 @@ COPY . .
 
 RUN docker-php-ext-install pdo pdo_mysql && docker-php-ext-enable pdo_mysql
 
-RUN composer update
+RUN composer install
